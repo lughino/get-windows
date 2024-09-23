@@ -3,7 +3,7 @@ name: Publish to npm and GitHub Release
 on:
   push:
     branches:
-      - main
+      - master
 
 permissions:
   contents: write
@@ -17,6 +17,8 @@ jobs:
       # Checkout the code
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Set up Node.js environment
       - name: Set up Node.js
@@ -28,6 +30,21 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: npm install
+
+      # Set Git user identity (for version bump commit)
+      - name: Set Git user identity
+        run: |
+          git config --global user.name "Timeo Williams"
+          git config --global user.email "timwillie73@gmail.com"
+
+      # Bump the package version early
+      - name: Bump version
+        run: npm version patch
+
+      # Push version commit and tag to GitHub
+      - name: Push version commit and tag
+        run: |
+          git push origin ${{ github.ref_name }} --tags
 
       # Install node-pre-gyp-github globally
       - name: Install node-pre-gyp-github
@@ -45,22 +62,7 @@ jobs:
       - name: Publish binary to GitHub Releases
         env:
           NODE_PRE_GYP_GITHUB_TOKEN: ${{ secrets.NODE_PRE_GYP_GITHUB_TOKEN }}
-        run: node-pre-gyp-github publish --release --target_commitish="${{ github.ref_name }}"
-
-      # Set Git user identity (for version bump commit)
-      - name: Set Git user identity
-        run: |
-          git config --global user.name "Timeo Williams"
-          git config --global user.email "timwillie73@gmail.com"
-
-      # Bump the package version
-      - name: Bump version
-        run: npm version patch
-
-      # Push version commit and tag to GitHub
-      - name: Push version commit and tag
-        run: |
-          git push origin ${{ github.ref_name }} --tags
+        run: node-pre-gyp-github publish --release
 
       # Publish to npm
       - name: Publish to npm
