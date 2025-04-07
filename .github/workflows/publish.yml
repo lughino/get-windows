@@ -1,6 +1,7 @@
 name: Publish to npm and GitHub Release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -34,8 +35,8 @@ jobs:
       # Set Git user identity (for version bump commit)
       - name: Set Git user identity
         run: |
-          git config --global user.name "Timeo Williams"
-          git config --global user.email "timwillie73@gmail.com"
+          git config --global user.name "Luca Pau"
+          git config --global user.email "3275254+lughino@users.noreply.github.com"
 
       # Bump the package version early
       - name: Bump version
